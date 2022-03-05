@@ -103,6 +103,12 @@
     <Compile Include="Icons\SystemImageList.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="IndexForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IndexForm.Designer.cs">
+      <DependentUpon>IndexForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Parsing\Filter.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -112,6 +118,9 @@
     <Content Include="App.ico" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IndexForm.resx">
+      <DependentUpon>IndexForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
