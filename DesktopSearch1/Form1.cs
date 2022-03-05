@@ -26,6 +26,7 @@ using Lucene.Net.QueryParsers;
 using Lucene.Net.Search;
 using DesktopSearch1.Icons;
 using DesktopSearch1.Parsing;
+using ZetaLongPaths;
 
 namespace DesktopSearch1
 {
@@ -306,7 +307,16 @@ namespace DesktopSearch1
 
         private void buttonIndex_Click(object sender, System.EventArgs e)
         {
-            indexWriter = new IndexWriter(this.pathIndex, new StandardAnalyzer(), true);
+            BuildIndex(true);
+        }
+
+        /// <summary>
+        /// Build index
+        /// </summary>
+        /// <param name="create">true if we should create a new index, false if we should add to the current</param>
+        private void BuildIndex(bool create)
+        {
+            indexWriter = new IndexWriter(this.pathIndex, new StandardAnalyzer(), create);
 
             bytesTotal = 0;
             countTotal = 0;
@@ -314,7 +324,7 @@ namespace DesktopSearch1
 
             enableControls(false);
 
-            DirectoryInfo di = new DirectoryInfo(this.textBoxPath.Text);
+            ZlpDirectoryInfo di = new ZlpDirectoryInfo(this.textBoxPath.Text);
 
             DateTime start = DateTime.Now;
 
@@ -345,12 +355,12 @@ namespace DesktopSearch1
         /// Indexes a folder.
         /// </summary>
         /// <param name="directory"></param>
-        private void addFolder(DirectoryInfo directory)
+        private void addFolder(ZlpDirectoryInfo directory)
         {
             // find all matching files
             foreach (string pattern in patterns)
             {
-                foreach (FileInfo fi in directory.GetFiles(pattern))
+                foreach (ZlpFileInfo fi in directory.GetFiles(pattern))
                 {
                     // skip temporary files
                     if (fi.Name.StartsWith("~"))
@@ -377,7 +387,7 @@ namespace DesktopSearch1
             }
 
             // add subfolders
-            foreach (DirectoryInfo di in directory.GetDirectories())
+            foreach (ZlpDirectoryInfo di in directory.GetDirectories())
             {
                 addFolder(di);
             }
