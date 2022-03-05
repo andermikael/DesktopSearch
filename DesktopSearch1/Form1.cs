@@ -77,6 +77,15 @@ namespace DesktopSearch1
 
             imageListDocuments = new SystemImageList(SystemImageListSize.SmallIcons);
             SystemImageListHelper.SetListViewImageList(listViewResults, imageListDocuments, false);
+            ResizeListViewColumns(listViewResults);
+        }
+
+        private void ResizeListViewColumns(ListView lv)
+        {
+            foreach (ColumnHeader column in lv.Columns)
+            {
+                column.Width = -2;
+            }
         }
 
         /// <summary>
@@ -189,8 +198,9 @@ namespace DesktopSearch1
             this.listViewResults.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
                                                                                               this.columnHeaderIcon,
                                                                                               this.columnHeaderName,
+                                                                                              this.columnHeaderScore,
                                                                                               this.columnHeaderFolder,
-                                                                                              this.columnHeaderScore});
+            });
             this.listViewResults.FullRowSelect = true;
             this.listViewResults.Location = new System.Drawing.Point(16, 208);
             this.listViewResults.Name = "listViewResults";
@@ -212,7 +222,7 @@ namespace DesktopSearch1
             // columnHeaderFolder
             //
             this.columnHeaderFolder.Text = "Folder";
-            this.columnHeaderFolder.Width = 120;
+            this.columnHeaderFolder.Width = 500;
             //
             // columnHeaderScore
             //
@@ -460,6 +470,7 @@ namespace DesktopSearch1
             //			Optionally limit the result count
             //			int resultsCount = smallerOf(20, hits.Length());
 
+            listViewResults.BeginUpdate();
             for (int i = 0; i < hits.Length(); i++)
             {
                 // get the document from index
@@ -468,15 +479,20 @@ namespace DesktopSearch1
                 // create a new row with the result data
                 string filename = doc.Get("title");
                 string path = doc.Get("path");
+
                 string folder = Path.GetDirectoryName(path);
+                Debug.WriteLine($"path: {path} - folder: {folder}");
+
                 DirectoryInfo di = new DirectoryInfo(folder);
 
-                ListViewItem item = new ListViewItem(new string[] { null, filename, di.Name, hits.Score(i).ToString() });
+                ListViewItem item = new ListViewItem(new string[] { null, filename, hits.Score(i).ToString(), di.FullName });
                 item.Tag = path;
                 item.ImageIndex = imageListDocuments.IconIndex(filename);
                 this.listViewResults.Items.Add(item);
                 Application.DoEvents();
             }
+            listViewResults.EndUpdate();
+            ResizeListViewColumns(listViewResults);
             searcher.Close();
 
             string searchReport = String.Format("Search took {0}. Found {1} items.", (DateTime.Now - start), hits.Length());
