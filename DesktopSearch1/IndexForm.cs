@@ -181,10 +181,12 @@ namespace DesktopSearch1
         {
             Document doc = new Document();
             string filename = Path.GetFileName(path);
+            string extention = Path.GetExtension(path);
 
             doc.Add(Field.UnStored("text", Parser.Parse(path)));
             doc.Add(Field.Keyword("path", path));
             doc.Add(Field.Text("title", filename));
+            doc.Add(Field.Text("ext", extention));
             indexWriter.AddDocument(doc);
         }
 
