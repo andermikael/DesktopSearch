@@ -10,6 +10,8 @@ using DesktopSearch1.Parsing;
 using ZetaLongPaths;
 using System.IO;
 using System.Drawing;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DesktopSearch1
 {
@@ -26,6 +28,8 @@ namespace DesktopSearch1
         private int countTotal = 0;
         private int countSkipped = 0;
 
+        private List<string> RootDirectories;
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -33,6 +37,21 @@ namespace DesktopSearch1
         {
             InitializeComponent();
             folderBrowserDialog1 = new FolderBrowserDialog();
+            RootDirectories = Properties.Settings.Default.RootDirectories;
+            PopulateRootDirectories(RootDirectories);
+        }
+
+        private void PopulateRootDirectories(List<string> rootDirectories)
+        {
+            if (rootDirectories == null)
+                return;
+
+            RootDirectoriesCombobox.Items.Clear();
+
+            foreach (var r in rootDirectories)
+            {
+                RootDirectoriesCombobox.Items.Add(r);
+            }
         }
 
         /// <summary>
@@ -51,7 +70,9 @@ namespace DesktopSearch1
         /// <param name="create">true if we should create a new index, false if we should add to the current</param>
         private void BuildIndex(bool create)
         {
-            indexWriter = new IndexWriter(this.pathIndex, new StandardAnalyzer(), create);
+            bool brc = AddRootDirectory(pathIndex);
+
+            indexWriter = new IndexWriter(pathIndex, new StandardAnalyzer(), create);
 
             bytesTotal = 0;
             countTotal = 0;
@@ -59,7 +80,7 @@ namespace DesktopSearch1
 
             enableControls(false);
 
-            ZlpDirectoryInfo di = new ZlpDirectoryInfo(this.textBoxPath.Text);
+            ZlpDirectoryInfo di = new ZlpDirectoryInfo(textBoxPath.Text);
 
             DateTime start = DateTime.Now;
 
@@ -74,22 +95,48 @@ namespace DesktopSearch1
             indexWriter.Close();
         }
 
+        private bool AddRootDirectory(string pathIndex)
+        {
+            bool result = true;
+
+            if (RootDirectories == null)
+            {
+                RootDirectories = new List<string>();
+            }
+
+            if (RootDirectories.Any(e => e.Equals(pathIndex)))
+            {
+                // directory alredy scanned
+                return false;
+            }
+            RootDirectories.Add(pathIndex);
+
+            // Save it to Settings
+            Properties.Settings.Default.RootDirectories = RootDirectories;
+            Properties.Settings.Default.Save();
+
+            // update Combobox
+            PopulateRootDirectories(RootDirectories);
+
+            return result;
+        }
+
         /// <summary>
         /// Turns the controls on or off.
         /// </summary>
         /// <param name="enable"></param>
         private void enableControls(bool enable)
         {
-            this.textBoxPath.Enabled = enable;
-            this.buttonIndex.Enabled = enable;
-            this.buttonBrowse.Enabled = enable;
-            this.buttonClean.Enabled = enable;
+            textBoxPath.Enabled = enable;
+            buttonIndex.Enabled = enable;
+            buttonBrowse.Enabled = enable;
+            buttonClean.Enabled = enable;
         }
 
         private void IndexForm_Load(object sender, EventArgs e)
         {
-            this.textBoxPath.Text = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-            this.pathIndex = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DesktopSearch");
+            textBoxPath.Text = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+            pathIndex = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DesktopSearch");
             checkIndex();
         }
 
@@ -104,12 +151,12 @@ namespace DesktopSearch1
 
         private void status(string msg, bool error)
         {
-            this.labelStatus.Text = msg;
+            labelStatus.Text = msg;
 
             if (error)
-                this.labelStatus.ForeColor = Color.Red;
+                labelStatus.ForeColor = Color.Red;
             else
-                this.labelStatus.ForeColor = DefaultForeColor;
+                labelStatus.ForeColor = DefaultForeColor;
 
             Application.DoEvents();
         }
@@ -118,7 +165,7 @@ namespace DesktopSearch1
         {
             try
             {
-                searcher = new IndexSearcher(this.pathIndex);
+                searcher = new IndexSearcher(pathIndex);
                 searcher.Close();
             }
             catch (IOException)
@@ -151,8 +198,8 @@ namespace DesktopSearch1
                         addDocument(fi.FullName);
 
                         // update statistics
-                        this.countTotal++;
-                        this.bytesTotal += fi.Length;
+                        countTotal++;
+                        bytesTotal += fi.Length;
 
                         // show added file
                         status(fi.FullName);
@@ -160,7 +207,7 @@ namespace DesktopSearch1
                     catch (Exception)
                     {
                         // parsing and indexing wasn't successful, skipping that file
-                        this.countSkipped++;
+                        countSkipped++;
                         status("Skipped: " + fi.FullName);
                     }
                 }
@@ -192,16 +239,16 @@ namespace DesktopSearch1
 
         private void buttonBrowse_Click(object sender, System.EventArgs e)
         {
-            this.folderBrowserDialog1.SelectedPath = this.textBoxPath.Text;
-            if (this.folderBrowserDialog1.ShowDialog() == DialogResult.OK)
+            folderBrowserDialog1.SelectedPath = textBoxPath.Text;
+            if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
-                this.textBoxPath.Text = this.folderBrowserDialog1.SelectedPath;
+                textBoxPath.Text = folderBrowserDialog1.SelectedPath;
             }
         }
 
         private void buttonClean_Click(object sender, System.EventArgs e)
         {
-            Directory.Delete(this.pathIndex, true);
+            Directory.Delete(pathIndex, true);
             checkIndex();
         }
 

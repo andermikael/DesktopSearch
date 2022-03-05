@@ -1,112 +1,117 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
+using DCLog;
 
 namespace DesktopSearch1.Parsing
 {
-	/// <summary>
-	/// Summary description for Parser.
-	/// </summary>
-	public class Parser
-	{
-		public Parser()
-		{
-		}
+    /// <summary>
+    /// Summary description for Parser.
+    /// </summary>
+    public class Parser
+    {
+        public Parser()
+        {
+        }
 
-		[DllImport("query.dll", CharSet = CharSet.Unicode)] 
-		private extern static int LoadIFilter (string pwcsPath, ref IUnknown pUnkOuter, ref IFilter ppIUnk); 
+        [DllImport("query.dll", CharSet = CharSet.Unicode)]
+        private static extern int LoadIFilter(string pwcsPath, ref IUnknown pUnkOuter, ref IFilter ppIUnk);
 
-		[ComImport, Guid("00000000-0000-0000-C000-000000000046")] 
-		[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)] 
-		private interface IUnknown 
-		{ 
-			[PreserveSig] 
-			IntPtr QueryInterface( ref Guid riid, out IntPtr pVoid ); 
- 
-			[PreserveSig] 
-			IntPtr AddRef(); 
- 
-			[PreserveSig] 
-			IntPtr Release(); 
-		} 
+        [ComImport, Guid("00000000-0000-0000-C000-000000000046")]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        private interface IUnknown
+        {
+            [PreserveSig]
+            IntPtr QueryInterface(ref Guid riid, out IntPtr pVoid);
 
+            [PreserveSig]
+            IntPtr AddRef();
 
-		private static IFilter loadIFilter(string filename)
-		{
-			IUnknown iunk = null; 
-			IFilter filter = null;
- 
-			// Try to load the corresponding IFilter 
-			int resultLoad = LoadIFilter( filename, ref iunk, ref filter ); 
-			if (resultLoad != (int)IFilterReturnCodes.S_OK) 
-			{ 
-				return null;
-			} 
-			return filter;
-		}
+            [PreserveSig]
+            IntPtr Release();
+        }
 
-/*
-		private static IFilter loadIFilterOffice(string filename)
-		{
-			IFilter filter = (IFilter)(new CFilter());
-			System.Runtime.InteropServices.UCOMIPersistFile ipf = (System.Runtime.InteropServices.UCOMIPersistFile)(filter);
-			ipf.Load(filename, 0);
+        private static IFilter loadIFilter(string filename)
+        {
+            IUnknown iunk = null;
+            IFilter filter = null;
 
-			return filter;
-		}
-*/
+            // Try to load the corresponding IFilter
+            int resultLoad = LoadIFilter(filename, ref iunk, ref filter);
+            if (resultLoad != (int)IFilterReturnCodes.S_OK)
+            {
+                Log.Error($"resultLoad: {resultLoad}");
+                return null;
+            }
+            return filter;
+        }
 
-		public static bool IsParseable(string filename)
-		{
-			return loadIFilter(filename) != null;
-		}
+        /*
+                private static IFilter loadIFilterOffice(string filename)
+                {
+                    IFilter filter = (IFilter)(new CFilter());
+                    System.Runtime.InteropServices.UCOMIPersistFile ipf = (System.Runtime.InteropServices.UCOMIPersistFile)(filter);
+                    ipf.Load(filename, 0);
 
-		public static string Parse(string filename)
-		{
-			IFilter filter = null;
+                    return filter;
+                }
+        */
 
-			try 
-			{
-				StringBuilder plainTextResult = new StringBuilder();
-				filter = loadIFilter(filename); 
+        public static bool IsParseable(string filename)
+        {
+            return loadIFilter(filename) != null;
+        }
 
-				STAT_CHUNK ps = new STAT_CHUNK();
-				IFILTER_INIT mFlags = 0;
+        public static string Parse(string filename)
+        {
+            IFilter filter = null;
 
-				uint i = 0;
-				filter.Init( mFlags, 0, null, ref i);
+            try
+            {
+                if (!IsParseable(filename))
+                {
+                    return string.Empty;
+                }
+                StringBuilder plainTextResult = new StringBuilder();
+                filter = loadIFilter(filename);
 
-				int resultChunk = 0;
+                STAT_CHUNK ps = new STAT_CHUNK();
+                IFILTER_INIT mFlags = 0;
 
-				resultChunk = filter.GetChunk(out ps);
-				while (resultChunk == 0)
-				{
-					if (ps.flags == CHUNKSTATE.CHUNK_TEXT)
-					{
-						uint sizeBuffer = 60000;
-						int resultText = 0;
-						while (resultText == Constants.FILTER_S_LAST_TEXT || resultText == 0)
-						{
-							sizeBuffer = 60000;
-							System.Text.StringBuilder sbBuffer = new System.Text.StringBuilder((int)sizeBuffer);
-							resultText = filter.GetText(ref sizeBuffer, sbBuffer);
+                uint i = 0;
+                filter.Init(mFlags, 0, null, ref i);
 
-							if (sizeBuffer > 0 && sbBuffer.Length > 0)
-							{
-								string chunk = sbBuffer.ToString(0, (int)sizeBuffer);
-								plainTextResult.Append(chunk);
-							}
-						}
-					}
-					resultChunk = filter.GetChunk(out ps);
-				}
-				return plainTextResult.ToString();
-			}
-			finally
-			{
-				if (filter != null)
-					Marshal.ReleaseComObject(filter);
-			}
-		}
-	}
+                int resultChunk = 0;
+
+                resultChunk = filter.GetChunk(out ps);
+                while (resultChunk == 0)
+                {
+                    if (ps.flags == CHUNKSTATE.CHUNK_TEXT)
+                    {
+                        uint sizeBuffer = 60000;
+                        int resultText = 0;
+                        while (resultText == Constants.FILTER_S_LAST_TEXT || resultText == 0)
+                        {
+                            sizeBuffer = 60000;
+                            System.Text.StringBuilder sbBuffer = new System.Text.StringBuilder((int)sizeBuffer);
+                            resultText = filter.GetText(ref sizeBuffer, sbBuffer);
+
+                            if (sizeBuffer > 0 && sbBuffer.Length > 0)
+                            {
+                                string chunk = sbBuffer.ToString(0, (int)sizeBuffer);
+                                plainTextResult.Append(chunk);
+                            }
+                        }
+                    }
+                    resultChunk = filter.GetChunk(out ps);
+                }
+                return plainTextResult.ToString();
+            }
+            finally
+            {
+                if (filter != null)
+                    Marshal.ReleaseComObject(filter);
+            }
+        }
+    }
 }

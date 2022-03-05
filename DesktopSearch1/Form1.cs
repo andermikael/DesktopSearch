@@ -97,6 +97,9 @@ namespace DesktopSearch1
             imageListDocuments = new SystemImageList(SystemImageListSize.SmallIcons);
             SystemImageListHelper.SetListViewImageList(listViewResults, imageListDocuments, false);
             ResizeListViewColumns(listViewResults);
+
+            string version = Application.ProductVersion;
+            DCLog.Log.Info($"Desktop Search version: {version}");
         }
 
         /// <summary>

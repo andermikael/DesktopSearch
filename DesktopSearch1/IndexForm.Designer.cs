@@ -37,6 +37,7 @@
             this.labelStatus = new System.Windows.Forms.Label();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.AddToIndexButton = new System.Windows.Forms.Button();
+            this.RootDirectoriesCombobox = new System.Windows.Forms.ComboBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -44,6 +45,7 @@
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.RootDirectoriesCombobox);
             this.groupBox1.Controls.Add(this.AddToIndexButton);
             this.groupBox1.Controls.Add(this.buttonClean);
             this.groupBox1.Controls.Add(this.label1);
@@ -53,7 +55,7 @@
             this.groupBox1.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.groupBox1.Location = new System.Drawing.Point(12, 27);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(758, 112);
+            this.groupBox1.Size = new System.Drawing.Size(758, 141);
             this.groupBox1.TabIndex = 10;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Index";
@@ -61,7 +63,7 @@
             // buttonClean
             // 
             this.buttonClean.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.buttonClean.Location = new System.Drawing.Point(304, 83);
+            this.buttonClean.Location = new System.Drawing.Point(307, 103);
             this.buttonClean.Name = "buttonClean";
             this.buttonClean.Size = new System.Drawing.Size(75, 23);
             this.buttonClean.TabIndex = 5;
@@ -81,7 +83,7 @@
             // 
             this.buttonBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonBrowse.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.buttonBrowse.Location = new System.Drawing.Point(670, 48);
+            this.buttonBrowse.Location = new System.Drawing.Point(673, 68);
             this.buttonBrowse.Name = "buttonBrowse";
             this.buttonBrowse.Size = new System.Drawing.Size(75, 23);
             this.buttonBrowse.TabIndex = 2;
@@ -92,7 +94,7 @@
             // 
             this.textBoxPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBoxPath.Location = new System.Drawing.Point(16, 48);
+            this.textBoxPath.Location = new System.Drawing.Point(19, 68);
             this.textBoxPath.Name = "textBoxPath";
             this.textBoxPath.Size = new System.Drawing.Size(638, 20);
             this.textBoxPath.TabIndex = 1;
@@ -100,7 +102,7 @@
             // buttonIndex
             // 
             this.buttonIndex.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.buttonIndex.Location = new System.Drawing.Point(184, 83);
+            this.buttonIndex.Location = new System.Drawing.Point(187, 103);
             this.buttonIndex.Name = "buttonIndex";
             this.buttonIndex.Size = new System.Drawing.Size(112, 23);
             this.buttonIndex.TabIndex = 3;
@@ -111,20 +113,28 @@
             // 
             this.labelStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelStatus.Location = new System.Drawing.Point(12, 147);
+            this.labelStatus.Location = new System.Drawing.Point(12, 171);
             this.labelStatus.Name = "labelStatus";
-            this.labelStatus.Size = new System.Drawing.Size(758, 91);
+            this.labelStatus.Size = new System.Drawing.Size(758, 67);
             this.labelStatus.TabIndex = 9;
             // 
             // AddToIndexButton
             // 
-            this.AddToIndexButton.Location = new System.Drawing.Point(19, 83);
+            this.AddToIndexButton.Location = new System.Drawing.Point(22, 103);
             this.AddToIndexButton.Name = "AddToIndexButton";
             this.AddToIndexButton.Size = new System.Drawing.Size(75, 23);
             this.AddToIndexButton.TabIndex = 6;
             this.AddToIndexButton.Text = "Add";
             this.AddToIndexButton.UseVisualStyleBackColor = true;
             this.AddToIndexButton.Click += new System.EventHandler(this.AddToIndexButton_Click);
+            // 
+            // RootDirectoriesCombobox
+            // 
+            this.RootDirectoriesCombobox.FormattingEnabled = true;
+            this.RootDirectoriesCombobox.Location = new System.Drawing.Point(22, 41);
+            this.RootDirectoriesCombobox.Name = "RootDirectoriesCombobox";
+            this.RootDirectoriesCombobox.Size = new System.Drawing.Size(635, 21);
+            this.RootDirectoriesCombobox.TabIndex = 7;
             // 
             // IndexForm
             // 
@@ -153,5 +163,6 @@
         private System.Windows.Forms.Label labelStatus;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
         private System.Windows.Forms.Button AddToIndexButton;
+        private System.Windows.Forms.ComboBox RootDirectoriesCombobox;
     }
 }
